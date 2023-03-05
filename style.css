@@ -78,7 +78,7 @@ main {
   flex: 1;
   display: flex;
   max-width: 100%;
-  min-width: 245px;
+  min-width: 300px;
 }
 
 #color-container {
@@ -187,11 +187,18 @@ a:hover {
   color: #b3e5fc;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 750px) {
   #two-col-container {
     flex-direction: column;
   }
   #left-col {
     margin-right: 0;
+  }
+  body {
+    padding: 20px;
+  }
+  #right-col {
+    justify-content: center;
+    margin-bottom: 20px;
   }
 }
