@@ -2,7 +2,7 @@ var resultRGBElement, resultHEXCSSElement, resultHEXXAMLElement;
 var resconstructedRGB, reconstructedError;
 var backgroundColorElement, targetColorElement, resultColorElement;
 var colorPicker, backgroundPicker, opacitySlider, opacitySliderValue;
-var colorPickerValue, backgroundPickerValue;
+var colorPickerValue;
 var alphaMinElement, alphaMaxElement, alphaErrorElement;
 
 if (Number.EPSILON === undefined) {
@@ -40,7 +40,6 @@ function init() {
   alphaMaxElement = document.getElementById('alpha-max');
   alphaErrorElement = document.getElementById('alpha-error');
   colorPickerValue = document.getElementById('color-picker-value');
-  backgroundPickerValue = document.getElementById('background-picker-value');
   updateColor();
 }
 
@@ -70,7 +69,6 @@ function updateColor() {
   backgroundColorElement.style.backgroundColor = backgroundColor.getRGBString();
   targetColorElement.style.backgroundColor = targetColor.getRGBString();
   colorPickerValue.innerText = targetColor.getRGBString();
-  backgroundPickerValue.innerText = backgroundColor.getRGBString();
 
   opacitronify(targetColor, backgroundColor, minimumAlpha);
 }
@@ -85,8 +83,6 @@ function updateOpacity() {
   backgroundColorElement.style.backgroundColor = backgroundColor.getRGBString();
   targetColorElement.style.backgroundColor = targetColor.getRGBString();
   colorPickerValue.innerText = targetColor.getRGBString();
-  backgroundPickerValue.innerText = backgroundColor.getRGBString();
-
   opacitronify(targetColor, backgroundColor, alpha);
 }
 

@@ -45,6 +45,7 @@ header {
 h2 {
   font-weight: normal;
   margin: 0.5rem 0;
+  text-transform: uppercase;
 }
 
 h3 {
