@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- fav icon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.svg">
+  <script src="main.js"></script>
+  <script src="opacitron.js"></script>
+  <title>Opacitron - Colour opacity matcher</title>
+</head>
+<body>
+<header>
+  <img id="logo" src="assets/logo.svg" alt="Opacitron" />
+</header>
+<main>
+  <div id="two-col-container">
+    <div id="left-col">
+      <div class="section">
+        <div class="row">
+          <label for="color-picker" class="row-title">Target colour</label>
+          <div class="picker-value">
+            <input type="color" id="color-picker" value="#FFE957" onchange="updateColor();" />
+            <div id="color-picker-value">#FFE957</div>
+          </div>
+        </div>
+        <div class="row">
+          <label for="background-picker" class="row-title">Background colour</label>
+          <div class="picker-value">
+            <input type="color" id="background-picker" value="#ffffff" onchange="updateColor();"/>
+            <div id="background-picker-value">#FFFFFF</div>
+          </div>
+        </div>
+        <div class="row" id="opacity-slider-row">
+          <label for="opacity-slider" class="row-title">Opacity</label>
+          <div id="opacity-slider-value">0.654</div>
+          <input type="range" id="opacity-slider" min="0" max="1" step="0.001" value="0.654" oninput="updateOpacity();" onchange="updateOpacity();"/>
+          <div class="values">
+            <div id="alpha-min">0</div>
+            <div id="alpha-max">1</div>
+          </div>
+        </div>
+        <div id="alpha-error">Opacity cannot be lower than 1 for this combination of colours.</div>
+
+      </div>
+
+      <div class="section">
+        <h3 class="font-varela text-ciron">Matching Colour</h3>
+        <div class="row">
+          <div class="row-title">RGB</div>
+          <div id="result-rgb">rgba(255, 255, 255, 0.4)</div>
+        </div>
+        <div class="row">
+          <div class="row-title">HEX (CSS)</div>
+          <div id="result-hex-css">#00000004</div>
+        </div>
+        <div class="row">
+          <div class="row-title">HEX (XAML)</div>
+          <div id="result-hex-xaml">#04000000</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3 class="font-varela text-ciron">Rounding Error</h3>
+        <div class="row">
+          <div class="row-title"><a href="https://en.wikipedia.org/wiki/Color_difference#CIE76" target="_blank">ΔE<sup>*</sup><sub>ab</sub></a></div>
+          <div id="reconstructed-error">0.4%</div>
+        </div>
+        <div class="row">
+          <div class="row-title">Blended RGB</div>
+          <div id="reconstructed-rgb">rgba(254.556, 255, 255, 0.4)</div>
+        </div>
+      </div>
+    </div>
+    <div id="right-col">
+      <div id="color-container">
+        <div id="transparent-background"></div>
+        <div id="color-background"></div>
+        <div id="target-color"></div>
+        <div id="result-color"></div>
+      </div>
+    </div>
+  </div>
+  <div id="about">
+    <h2 class="font-varela text-ciron">About</h2>
+    <p>
+      Opacitron uses <a href="https://en.wikipedia.org/wiki/Alpha_compositing" target="_blank">alpha compositing</a> to find a transparent colour that matches an opaque colour on a given background colour.
+    </p>
+  </div>
+</main>
+</body>
+</html>
