@@ -135,6 +135,10 @@ var ColorUtils = (function () {
     return normalizedValue <= 0.04045 ? normalizedValue / 12.92 : Math.pow((normalizedValue + 0.055) / 1.055, 2.4);
   }
 
+  ColorUtils.scRGB2sRGB = function (normalizedValue) {
+    return normalizedValue <= 0.0031308 ? normalizedValue * 12.92 : 1.055 * Math.pow(normalizedValue, 1 / 2.4) - 0.055;
+  }
+
   ColorUtils.scRGB2XYZ = function (rgb) {
     var X = rgb[0] * 0.4124 + rgb[1] * 0.3576 + rgb[2] * 0.1805;
     var Y = rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
@@ -177,9 +181,10 @@ var ColorUtils = (function () {
 /* ------------------------------ Opacitron ------------------------------ */
 /* ----------------------------------------------------------------------- */
 
+var useLinear = false;
+
 var Opacitron = (function () {
   function Opacitron () { }
-
   /**
    * Calculates the minimum allowed opacity/alpha value for this combination of target and background colors
    * @param {Color} targetColorArr Array of RGB values representing the target color
@@ -189,6 +194,11 @@ var Opacitron = (function () {
   Opacitron.getMinimumAlpha = function (targetColor, backgroundColor) {
     var targetColorArr = targetColor.getNormalisedRGB();
     var backgroundColorArr = backgroundColor.getNormalisedRGB();
+
+    if (useLinear) {
+      targetColorArr = targetColorArr.map(v => ColorUtils.sRGB2scRGB(v));
+      backgroundColorArr = backgroundColorArr.map(v => ColorUtils.sRGB2scRGB(v));
+    }
     var alphas = []
     for (var i = 0; i < 3; i++) {
       var minAlpha1 = 1 - targetColorArr[i] / backgroundColorArr[i];
@@ -211,12 +221,27 @@ var Opacitron = (function () {
    * @returns {Color} Array of RGB values representing the resulting color
    */
   Opacitron.getResultColor = function (targetColor, backgroundColor, alpha) {
-    var targetColorArr = targetColor.getColor();
-    var backgroundColorArr = backgroundColor.getColor();
+    var targetColorArr = targetColor.getNormalisedRGB();
+    var backgroundColorArr = backgroundColor.getNormalisedRGB();
+
+    if (useLinear) {
+      targetColorArr = targetColorArr.map(v => ColorUtils.sRGB2scRGB(v));
+      backgroundColorArr = backgroundColorArr.map(v => ColorUtils.sRGB2scRGB(v));
+    }
+
     var resultColor = [];
     for (var i = 0; i < 3; i++) {
       resultColor[i] = (targetColorArr[i] - (1 - alpha) * backgroundColorArr[i]) / alpha;
     }
+
+    if (useLinear) {
+      resultColor = resultColor.map(v => ColorUtils.scRGB2sRGB(v));
+    }
+
+    for (var i = 0; i < 3; i++) {
+      resultColor[i] *= 255;
+    }
+
     return new Color(resultColor, alpha);
   }
 
@@ -231,13 +256,28 @@ var Opacitron = (function () {
     return Math.sqrt(dL * dL + da * da + db * db);
   }
 
+
   Opacitron.blendColor = function (color, backgroundColor, alpha) {
-    var colorArr = color.getColor();
-    var backgroundColorArr = backgroundColor.getColor();
+    var colorArr = color.getNormalisedRGB();
+    var backgroundColorArr = backgroundColor.getNormalisedRGB();
+
+    if (useLinear) {
+      colorArr = colorArr.map(v => ColorUtils.sRGB2scRGB(v));
+      backgroundColorArr = backgroundColorArr.map(v => ColorUtils.sRGB2scRGB(v));
+    }
+
     var resultColor = [];
     for (var i = 0; i < 3; i++) {
       resultColor[i] = (alpha * colorArr[i] + (1 - alpha) * backgroundColorArr[i]);
     }
+    if (useLinear) {
+      resultColor = resultColor.map(v => ColorUtils.scRGB2sRGB(v));
+    }
+
+    for (var i = 0; i < 3; i++) {
+      resultColor[i] *= 255;
+    }
+
     return new Color(resultColor);
   }
 
