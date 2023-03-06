@@ -25,8 +25,8 @@ body {
   font-family: 'Varela Round', sans-serif;
 }
 
-.text-ciron {
-  color: #FDDF19;
+.text-citron {
+  color: #FFE957;
 }
 
 header {
@@ -185,6 +185,17 @@ a {
 
 a:hover {
   color: #b3e5fc;
+}
+
+.warning-body img {
+  margin-right: 5px;
+  margin-bottom: -2px;
+}
+
+.warning-body {
+  border-radius: 0 0 5px 5px;
+  align-items: center;
+  margin-top: 20px;
 }
 
 @media screen and (max-width: 750px) {
