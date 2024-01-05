@@ -41,6 +41,22 @@ Color.prototype.getRGBString = function (precision) {
   return ColorUtils.getRGBString(this, this.alpha, precision);
 }
 
+Color.prototype.getP3String = function (precision) {
+  if (!precision) precision = 3;
+  return ColorUtils.getP3String(this, this.alpha, precision);
+}
+
+Color.prototype.getColorString = function (precision) {
+  var hasP3Color = window
+  .matchMedia('(color-gamut: p3)')
+  .matches;
+  if (hasP3Color) {
+    return ColorUtils.getP3String(this, this.alpha, precision);
+  } else {
+    return ColorUtils.getRGBString(this, this.alpha, precision);
+  }
+}
+
 /**
  * @param {'css'|'xaml'} style 'css' or 'xaml'
  * @returns {string} HEX string in specified style
@@ -124,9 +140,23 @@ var ColorUtils = (function () {
       return roundWithPrecision(value, precision);
     });
     if (alpha != 1) {
-      return 'rgba(' + roundedRGB[0] + ', ' + roundedRGB[1] + ', ' + roundedRGB[2] + ', ' + alpha + ')';
+      return 'rgba(' + roundedRGB[0] + ', ' + roundedRGB[1] + ', ' + roundedRGB[2] + ', ' + (alpha * 100).toFixed(1) + '%)';
     } else {
       return 'rgb(' + roundedRGB[0] + ', ' + roundedRGB[1] + ', ' + roundedRGB[2] + ')';
+    }
+  }
+
+  ColorUtils.getP3String = function (color, alpha, precision) {
+    var rgb = color.getColor();
+    if (!alpha) alpha = 1;
+    if (!precision) precision = 3;
+    var roundedRGB = rgb.map(function (value) {
+      return roundWithPrecision(value/255, precision);
+    });
+    if (alpha != 1) {
+      return 'color(display-p3 ' + roundedRGB[0] + ' ' + roundedRGB[1] + ' ' + roundedRGB[2] + ' / ' + (alpha * 100).toFixed(1) + '%)';
+    } else {
+      return 'color(display-p3 ' + roundedRGB[0] + ' ' + roundedRGB[1] + ' ' + roundedRGB[2] + ')';
     }
   }
 
@@ -194,13 +224,14 @@ var Opacitron = (function () {
       var minAlpha1 = 1 - targetColorArr[i] / backgroundColorArr[i];
       var minAlpha2 = backgroundColorArr[i] == 1 ? 0 : (backgroundColorArr[i] - targetColorArr[i]) / (backgroundColorArr[i] - 1);
       alphas[i] = Math.max(minAlpha1, minAlpha2);
+      if (isNaN(alphas[i])) alphas[i] = 0
     }
     var maxAlphaChannel = Math.max(alphas[0], alphas[1], alphas[2]);
     var alphaMin = Math.min(Math.round(maxAlphaChannel * 1000) / 1000, 1000);
     if (alphaMin <= 0) {
       alphaMin = Number.EPSILON;
     }
-    return alphaMin;
+    return alphaMin.toFixed(3);
   }
 
   /**
@@ -214,8 +245,10 @@ var Opacitron = (function () {
     var targetColorArr = targetColor.getColor();
     var backgroundColorArr = backgroundColor.getColor();
     var resultColor = [];
+    alpha = Number(alpha)
     for (var i = 0; i < 3; i++) {
-      resultColor[i] = (targetColorArr[i] - (1 - alpha) * backgroundColorArr[i]) / alpha;
+      if (alpha > 0) resultColor[i] = (targetColorArr[i] - (1 - alpha) * backgroundColorArr[i]) / alpha;
+      else resultColor[i] = targetColorArr[i]
     }
     return new Color(resultColor, alpha);
   }

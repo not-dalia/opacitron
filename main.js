@@ -1,4 +1,4 @@
-var resultRGBElement, resultHEXCSSElement, resultHEXXAMLElement;
+var resultRGBElement, resultP3Element, resultHEXCSSElement, resultHEXXAMLElement, colorSpaceElement;
 var resconstructedRGB, reconstructedError;
 var backgroundColorElement, targetColorElement, resultColorElement;
 var colorPicker, backgroundPicker, opacitySlider, opacitySliderValue;
@@ -24,9 +24,11 @@ function ready(callbackFunc) {
 }
 
 function init() {
-  resultRGBElement = document.getElementById('result-rgb');
+  resultRGBElement = document.getElementById('result-srgb');
+  resultP3Element = document.getElementById('result-p3');
   resultHEXCSSElement = document.getElementById('result-hex-css');
   resultHEXXAMLElement = document.getElementById('result-hex-xaml');
+  colorSpaceElement = document.getElementById('gamut-label');
   resconstructedRGB = document.getElementById('reconstructed-rgb');
   reconstructedError = document.getElementById('reconstructed-error');
   backgroundColorElement = document.getElementById('color-background');
@@ -66,9 +68,10 @@ function updateColor() {
     alphaErrorElement.classList.add('hide');
   }
 
-  backgroundColorElement.style.backgroundColor = backgroundColor.getRGBString();
-  targetColorElement.style.backgroundColor = targetColor.getRGBString();
+  backgroundColorElement.style.backgroundColor = backgroundColor.getColorString();
+  targetColorElement.style.backgroundColor = targetColor.getColorString();
   colorPickerValue.innerText = targetColor.getRGBString();
+  colorSpaceElement.innerText = getColorSpace()
 
   opacitronify(targetColor, backgroundColor, minimumAlpha);
 }
@@ -80,16 +83,19 @@ function updateOpacity() {
 
   opacitySliderValue.innerText = alpha;
 
-  backgroundColorElement.style.backgroundColor = backgroundColor.getRGBString();
-  targetColorElement.style.backgroundColor = targetColor.getRGBString();
+  backgroundColorElement.style.backgroundColor = backgroundColor.getColorString();
+  targetColorElement.style.backgroundColor = targetColor.getColorString();
   colorPickerValue.innerText = targetColor.getRGBString();
+  colorSpaceElement.innerText = getColorSpace()
+
   opacitronify(targetColor, backgroundColor, alpha);
 }
 
 function opacitronify(targetColor, backgroundColor, alpha) {
   var resultColor = Opacitron.getResultColor(targetColor, backgroundColor, alpha);
-  resultColorElement.style.backgroundColor = resultColor.getRGBString();
+  resultColorElement.style.backgroundColor = resultColor.getColorString();
   resultRGBElement.innerText = resultColor.getRGBString();
+  resultP3Element.innerText = resultColor.getP3String();
   resultHEXCSSElement.innerText = resultColor.getHEXString('css');
   resultHEXXAMLElement.innerText = resultColor.getHEXString('xaml');
 
@@ -99,6 +105,17 @@ function opacitronify(targetColor, backgroundColor, alpha) {
   resconstructedRGB.innerText = composedColor.getRGBString(3);
   var error = Opacitron.deltaE(targetColor, composedColor);
   reconstructedError.innerText = error.toFixed(2);
+}
+
+function getColorSpace() {
+  var hasP3Color = window
+  .matchMedia('(color-gamut: p3)')
+  .matches;
+  if (hasP3Color) {
+    return 'Display P3'
+  } else {
+    return 'sRGB'
+  }
 }
 
 ready(init);

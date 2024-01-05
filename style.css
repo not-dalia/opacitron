@@ -121,6 +121,17 @@ main {
   z-index: 2;
 }
 
+#gamut-label-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: white;
+  transform: translateY(100%);
+  padding: 10px;
+  text-align: center;
+}
+
 #left-col {
   display: flex;
   flex-direction: column;
